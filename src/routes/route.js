@@ -4,14 +4,14 @@ const router = express.Router()
 const internController = require("../controllers/internController")
 const collegeController = require("../controllers/collegeController")
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>routes>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// >>>>>>>>>>>>>>>>>>>>>>>>>> routes >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 router.post('/functionup/colleges', collegeController.createCollege);
 router.post('/functionup/interns', internController.createIntern);
 router.get('/functionup/collegeDetails', collegeController.collegeDetails);
 
 
-// global route>>>>>>>>>>
+// global route >>>>>>>>>>
 router.all("/**", function (req, res) {
     res.status(404).send({
         status: false,

@@ -1,7 +1,7 @@
 const collegeModel = require("../model/collegeModel")
 const internModel = require("../model/internModel")
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>Validation>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>> Validation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const regexMail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
 const regexNumber = /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/
@@ -14,7 +14,7 @@ const isValid = function (value) {
     return true;
 }
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>postapi>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> post Api >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const createIntern = async function (req, res) {
     try {
@@ -36,7 +36,7 @@ const createIntern = async function (req, res) {
 
         const emailAlraedyUsed = await internModel.findOne({ email })
         if (emailAlraedyUsed) {
-            return res.status(400).send({ status: false, msg: "Email already used" })
+            return res.status(409).send({ status: false, msg: "Email already used" })
         }
 
         if (!isValid(mobile)) return res.status(400).send({ status: false, msg: "Mobile Number is required" })
@@ -46,12 +46,12 @@ const createIntern = async function (req, res) {
 
         const mobileAlreadyUsed = await internModel.findOne({ mobile: mobile })
         if (mobileAlreadyUsed) {
-            return res.status(400).send({ status: false, msg: "Mobile Number already used" })
+            return res.status(409).send({ status: false, msg: "Mobile Number already used" })
         }
 
         if (!isValid(collegeName)) return res.status(400).send({ status: false, msg: " College Name is required" })
 
-        const college = await collegeModel.findOne({ name: collegeName })
+        const college = await collegeModel.findOne({ name: collegeName, isDeleted: false })
         if (!college) return res.status(400).send({ status: false, msg: "enter a valid college name" })
 
         const collegeId = college._id
@@ -62,9 +62,16 @@ const createIntern = async function (req, res) {
         const allData = { name, email, mobile, collegeId }
 
         const newData = await internModel.create(allData)
-        let newData1 = { isDeleted: newData.isDeleted, name: newData.name, email: newData.email, mobile: newData.mobile, collegeId }
-        return res.status(201).send({ status: true, data: newData1 })
 
+        let newData1 = {
+            isDeleted: newData.isDeleted,
+            name: newData.name,
+            email: newData.email,
+            mobile: newData.mobile,
+            collegeId
+        }
+
+        return res.status(201).send({ status: true, data: newData1 })
 
     } catch (error) {
         res.status(500).send({ status: false, message: error.message });
